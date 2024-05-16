@@ -9,7 +9,7 @@ services:
       - "8020:8020" # fs.defaultFS
       - "9870:9870" # NameNode Web UI
       - "9868:9868" # Secondary NameNode Web UI
-      - "8088:8088" #
+      - "8088:8088" # Yarn
     volumes:
       - ./namenode:/root/hadoop/tmp/dfs/namenode
     command: bash -c "
