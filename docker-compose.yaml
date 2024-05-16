@@ -31,6 +31,7 @@ services:
     image: hadoop
     container_name: slave1
     hostname: slave1
+
     volumes:
       - ./datanode1:/root/hadoop/tmp/dfs/datanode
     command: bash -c "
@@ -43,6 +44,7 @@ services:
     image: hadoop
     container_name: slave2
     hostname: slave2
+
     volumes:
       - ./datanode2:/root/hadoop/tmp/dfs/datanode
     command: bash -c "
@@ -55,6 +57,7 @@ services:
     image: hadoop
     container_name: slave3
     hostname: slave3
+
     volumes:
       - ./datanode3:/root/hadoop/tmp/dfs/datanode
     command: bash -c "
