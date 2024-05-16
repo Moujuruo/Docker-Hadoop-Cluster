@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  master:
+    image: hadoop
+    container_name: master
+    hostname: master
+    ports:
+      - "8020:8020" # fs.defaultFS
+      - "9870:9870" # NameNode Web UI
+      - "9868:9868" # Secondary NameNode Web UI
+      - "8088:8088" #
+    volumes:
+      - ./namenode:/root/hadoop/tmp/dfs/namenode
+    command: bash -c "
+              service ssh restart && 
+              if [ ! -d /root/hadoop/tmp/dfs/namenode/current ]; then
+                hdfs namenode -format;
+              fi &&
+              start-all.sh &&
+              tail -f /dev/null &&
+              hadoop fs -chmod -R 777 /"
+    networks:
+      - hadoop-network
+    depends_on:
+      - slave1
+      - slave2
+      - slave3
+
+  slave1:
+    image: hadoop
+    container_name: slave1
+    hostname: slave1
+    volumes:
+      - ./datanode1:/root/hadoop/tmp/dfs/datanode
+    command: bash -c "
+              service ssh restart && 
+              tail -f /dev/null"
+    networks:
+      - hadoop-network
+
+  slave2:
+    image: hadoop
+    container_name: slave2
+    hostname: slave2
+    volumes:
+      - ./datanode2:/root/hadoop/tmp/dfs/datanode
+    command: bash -c "
+              service ssh restart && 
+              tail -f /dev/null"
+    networks:
+      - hadoop-network
+
+  slave3:
+    image: hadoop
+    container_name: slave3
+    hostname: slave3
+    volumes:
+      - ./datanode3:/root/hadoop/tmp/dfs/datanode
+    command: bash -c "
+              service ssh restart && 
+              tail -f /dev/null"
+    networks:
+      - hadoop-network
+
+networks:
+  hadoop-network:
+    driver: bridge
