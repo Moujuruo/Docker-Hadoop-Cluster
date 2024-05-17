@@ -51,6 +51,10 @@ ENV YARN_NODEMANAGER_USER="root"
 
 # 配置Hadoop
 COPY hadoop_config/* /root/hadoop/etc/hadoop/
+COPY modify.sh /root/modify.sh
+
+# Make the script executable
+RUN chmod +x /root/modify.sh
 RUN sed -i '1i export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' /root/hadoop/etc/hadoop/hadoop-env.sh
 
 # 配置SSH

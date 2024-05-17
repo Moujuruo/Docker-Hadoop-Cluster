@@ -17,6 +17,7 @@ Docker 的下载与安装参见，https://docs.docker.com/desktop/install/window
 3. 进入 amd64 目录 `cd amd64`
 4. 构建镜像 `docker build . -t hadoop`，这一步需要等待一些时间，网络正常情况下不超过 10 分钟
 5. 返回上级目录 `cd ..`
+6. 创建桥接网络 `docker network create hadoop-network`
 6. 运行容器 `docker-compose up -d`
 
 到这里如果一切正常，你应该能看到
@@ -31,7 +32,17 @@ Hadoop 暴露的几个端口如下：
 - "9868:9868" # Secondary NameNode Web UI
 - "8088:8088" # Yarn Web UI
 
-除了 8020 外，其它都可以在本地浏览器中通过 `localhost:端口号` 或 `127.0.0.1:端口号` 访问。
+为了在主机能够正常访问，还需要在主机的`C:\Windows\System32\drivers\etc`目录下的`hosts`文件中添加如下内容
+```
+127.0.0.1 master
+127.0.0.1 slave1
+127.0.0.1 slave2
+127.0.0.1 slave3
+```
+
+> 注意，由于 Docker 的限制，这里将三台slave有关DataNode的端口映射到了主机的不同端口，具体可在`docker-compose.yml`中查看。
+
+在这之后，除了 8020 外，其它都可以在本地浏览器中通过 `master:端口号` 或 `slave1/2/3:端口号` 访问。
 
 此外再介绍几个操作方便使用 Docker，由于未知原因，这里不推荐使用 Docker Desktop 的可视化界面进行操作
 - 容器关闭，`docker-compose stop`
@@ -58,6 +69,8 @@ Hadoop 暴露的几个端口如下：
 IDEA 中可以安装插件 BigData Tools，直接连接 HDFS，配置如下：
 ![alt text](Picture/image4.png)
 
+如果采用方式一，只需完成上面的步骤三，其余步骤参考https://www.cnblogs.com/my-blogs-for-everone/articles/16485686.html。
+> 注意，方式一配置可能无法完全满足实验要求
 
 ## 测试
 
@@ -111,7 +124,7 @@ public static void main(String[] args) throws IOException, InterruptedException,
 
         Configuration conf = new Configuration();
 //这里指定使用的是hdfs文件系统
-        conf.set("fs.defaultFS", "hdfs://127.0.0.1:8020");
+        conf.set("fs.defaultFS", "hdfs://master:8020");
 //通过如下的方式进行客户端身份的设置
         System.setProperty("HADOOP_USER_NAME", "root");
 //通过FileSystem的静态方法获取文件系统客户端对象
@@ -127,4 +140,94 @@ public static void main(String[] args) throws IOException, InterruptedException,
     }
 }
 ```
-执行后可以在`http://localhost:9870/explorer.html#`中看到新建的文件夹和文件。
+执行后可以在`http://master:9870/explorer.html#`中看到新建的文件夹和文件。
+
+### 词频统计代码及步骤
+```
+package org.example;
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+
+
+public class Demo {
+
+    public static class TokenizerMapper
+            extends Mapper<Object, Text, Text, IntWritable> {
+
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+
+        public void map(Object key, Text value, Context context
+        ) throws IOException, InterruptedException {
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken());
+                context.write(word, one);
+            }
+        }
+    }
+
+    public static class IntSumReducer
+            extends Reducer<Text, IntWritable, Text, IntWritable> {
+        private IntWritable result = new IntWritable();
+
+        public void reduce(Text key, Iterable<IntWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
+
+        Configuration conf = new Configuration();
+        conf.set("dfs.client.use.datanode.hostname", "true");
+        conf.set("fs.defaultFS", "hdfs://master:8020");
+        Job job = Job.getInstance(conf, "word count");
+        job.setJarByClass(Demo.class);
+        job.setMapperClass(TokenizerMapper.class);
+        job.setCombinerClass(IntSumReducer.class);
+        job.setReducerClass(IntSumReducer.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+    }
+}
+```
+1. 通过 WebUI 在 HDFS 中上传 test.txt 文件至/input/test.txt，详见实验给出的数据集
+2. 在 IDEA 中配置运行参数，第一个参数为`hdfs://master:8020/input/test.txt`，第二个参数为`hdfs://master:8020/output`
+![alt text](Picture/image5.png)
+3. 在项目的 resources 文件夹下放置 `log4j.properties` 文件，仓库中提供了，否则日志不会显示
+4. 运行即可
+
+> 如下图显示的这些报错是不影响结果的，是由于部分包冲突，暂时未找到解决方案
+![alt text](Picture/image6.png)
+
+运行结果如下，可在 WebUI 中查看
+![alt text](Picture/image7.png)
+
+## 其它踩坑与 NOTE
+
+1. 由于 Docker 的限制，这里将三台slave有关DataNode的端口映射到了主机的不同端口，具体可在`docker-compose.yml`中查看。在主机可以通过不同的端口号访问。也可以在http://master:9870/dfshealth.html#tab-datanode 页面查看访问。
+2. 远程操作时，注意代码中要添加`conf.set("dfs.client.use.datanode.hostname", "true");`，如上面的词频统计代码所示。
+3. 报错时多看日志，一般可以发现问题。
+4. Hadoop 不会自动删除输出文件夹，如果多次运行，需要手动删除。

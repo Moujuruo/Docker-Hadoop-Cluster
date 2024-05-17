@@ -31,7 +31,9 @@ services:
     image: hadoop
     container_name: slave1
     hostname: slave1
-
+    ports:
+      - "9864:9864" # DataNode Web UI
+      - "9866:9866" # `
     volumes:
       - ./datanode1:/root/hadoop/tmp/dfs/datanode
     command: bash -c "
@@ -44,10 +46,13 @@ services:
     image: hadoop
     container_name: slave2
     hostname: slave2
+    ports:
+      - "9966:9966"
+      - "9964:9964"
 
     volumes:
       - ./datanode2:/root/hadoop/tmp/dfs/datanode
-    command: bash -c "
+    command: /root/modify.sh bash -c "
               service ssh restart && 
               tail -f /dev/null"
     networks:
@@ -57,10 +62,12 @@ services:
     image: hadoop
     container_name: slave3
     hostname: slave3
-
+    ports:
+      - "10066:10066"
+      - "10064:10064"
     volumes:
       - ./datanode3:/root/hadoop/tmp/dfs/datanode
-    command: bash -c "
+    command: /root/modify.sh bash -c "
               service ssh restart && 
               tail -f /dev/null"
     networks:
