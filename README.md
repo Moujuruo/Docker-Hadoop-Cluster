@@ -106,6 +106,8 @@ IDEA 中可以安装插件 BigData Tools，直接连接 HDFS，配置如下：
         </dependency>
     </dependencies>
 ```
+> 注意，这里给出的是 Hadoop 3.3.6 的依赖，如果你使用的是其它版本，需要修改版本号，此外这里的 exclusion 本意是想解决包冲突问题（未知原因），但实际上并没有完全解决，但不影响程序运行。删去 exclusions 部分也不影响程序运行。
+
 提供操作 HDFS 的示例代码如下
 ```java
 package org.example;
