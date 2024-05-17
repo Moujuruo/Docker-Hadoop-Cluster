@@ -1,4 +1,4 @@
-# 单机真分布式纯 Hadoop Docker 最速配置方式指北（用于实验）
+# 单机真分布式纯 Hadoop Docker 较速配置方式指北（用于实验）
 
 本方案提供哈工大分布式系统 lab2 Hadoop Linux 环境配置方案，在已有 Docker 的前提下，可以实现七分钟以内完成 Hadoop 3.3.6 配置（指 Linux 部分）进行实验，以下给出详细操作步骤。
 
