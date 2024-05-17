@@ -47,7 +47,8 @@ Hadoop 暴露的几个端口如下：
 此外再介绍几个操作方便使用 Docker，由于未知原因，这里不推荐使用 Docker Desktop 的可视化界面进行操作
 - 容器关闭，`docker-compose stop`
 - 容器再次启动，`docker-compose up -d`
-- 进入容器使用 bash，`docker exec -it master bash`
+- 进入容器使用 bash，`docker exec -it master bash`,`docker exec -it slave1 bash`, ..., 容器内即为 Ubuntu 22.04 系统
+- 从容器中退出，`exit`
 
 ## IDEA 连接
 
