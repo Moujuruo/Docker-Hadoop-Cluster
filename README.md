@@ -1,6 +1,6 @@
 # 单机真分布式纯 Hadoop Docker 最速配置方式指北
 
-本方案提供哈工大分布式系统 lab2 Hadoop Linux 环境配置方案，在已有 Docker 的前提下，可以实现五分钟以内完成 Hadoop 3.3.6 配置进行实验，以下给出详细操作步骤。
+本方案提供哈工大分布式系统 lab2 Hadoop Linux 环境配置方案，在已有 Docker 的前提下，可以实现七分钟以内完成 Hadoop 3.3.6 配置（指 Linux 部分）进行实验，以下给出详细操作步骤。
 
 ## 前置准备
 
@@ -63,7 +63,7 @@ Hadoop 暴露的几个端口如下：
 ![alt text](Picture/image2.png)
 5. 在环境变量 Path 中新增变量值 `%HADOOP_HOME%\bin`
 ![alt text](Picture/image3.png)
-6. 修改解压路径 `\hadoop-3.3.6\etc\hadoop\hadoop-env.cmd` 内容，搜索`set JAVA_HOME=` 将原来的`set JAVA_HOME=%JAVA_HOME%`改为`set JAVA_HOME=你的jdk路径`，例如`set JAVA_HOME=C:\PROGRA~1\Java\jdk1.8.0_202`, 特别注意，如果如今中是`Program Files`存在空格，需要用`PROGRA~1`代替`Program Files`，就如上面的例子。
+6. 修改解压路径 `\hadoop-3.3.6\etc\hadoop\hadoop-env.cmd` 内容，搜索`set JAVA_HOME=` 将原来的`set JAVA_HOME=%JAVA_HOME%`改为`set JAVA_HOME=你的jdk路径`，例如`set JAVA_HOME=C:\PROGRA~1\Java\jdk1.8.0_202`, 特别注意，如果路径中有`Program Files`存在空格，需要用`PROGRA~1`代替`Program Files`，就如上面的例子。
 7. 重启电脑，在 cmd 中输入`hadoop version`，如果出现版本号，说明配置成功。
 
 IDEA 中可以安装插件 BigData Tools，直接连接 HDFS，配置如下：
@@ -143,6 +143,8 @@ public static void main(String[] args) throws IOException, InterruptedException,
 执行后可以在`http://master:9870/explorer.html#`中看到新建的文件夹和文件。
 
 ### 词频统计代码及步骤
+以下给出在 IDEA 中连接 Docker 容器中的 Hadoop 集群，实现词频统计的代码，也可以作为第二个实验的脚手架使用。
+
 ```
 package org.example;
 import java.io.IOException;
@@ -158,8 +160,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-
-
 
 public class Demo {
 
@@ -198,7 +198,7 @@ public class Demo {
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 
         Configuration conf = new Configuration();
-        conf.set("dfs.client.use.datanode.hostname", "true");
+        conf.set("dfs.client.use.datanode.hostname", "true"); // 这很重要
         conf.set("fs.defaultFS", "hdfs://master:8020");
         Job job = Job.getInstance(conf, "word count");
         job.setJarByClass(Demo.class);
