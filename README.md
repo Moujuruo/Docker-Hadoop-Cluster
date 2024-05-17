@@ -70,7 +70,7 @@ Hadoop 暴露的几个端口如下：
 IDEA 中可以安装插件 BigData Tools，直接连接 HDFS，配置如下：
 ![alt text](Picture/image4.png)
 
-如果采用方式一，只需完成上面的步骤三，其余步骤参考https://www.cnblogs.com/my-blogs-for-everone/articles/16485686.html。
+如果采用方式一，只需完成上面的步骤三，其余步骤参考https://www.cnblogs.com/my-blogs-for-everone/articles/16485686.html
 > 注意，方式一配置可能无法完全满足实验要求
 
 ## 测试
@@ -107,7 +107,7 @@ IDEA 中可以安装插件 BigData Tools，直接连接 HDFS，配置如下：
     </dependencies>
 ```
 提供操作 HDFS 的示例代码如下
-```
+```java
 package org.example;
 import java.io.IOException;
 import java.util.StringTokenizer;
@@ -146,7 +146,7 @@ public static void main(String[] args) throws IOException, InterruptedException,
 ### 词频统计代码及步骤
 以下给出在 IDEA 中连接 Docker 容器中的 Hadoop 集群，实现词频统计的代码，也可以作为第二个实验的脚手架使用。
 
-```
+```java
 package org.example;
 import java.io.IOException;
 import java.util.StringTokenizer;
@@ -214,10 +214,10 @@ public class Demo {
     }
 }
 ```
-1. 通过 WebUI(master:9870) 在 HDFS 中上传 test.txt 文件至/input/test.txt，详见实验给出的数据集
+1. 通过 WebUI(master:9870/explorer.html#) 在 HDFS 中上传 test.txt 文件至`/input/test.txt`，详见实验给出的数据集
 2. 在 IDEA 中配置运行参数，第一个参数为`hdfs://master:8020/input/test.txt`，第二个参数为`hdfs://master:8020/output`
 ![alt text](Picture/image5.png)
-3. 在项目的 resources 文件夹下放置 `log4j.properties` 文件，仓库中提供了，否则日志不会显示
+3. 在项目的 resources 文件夹下放置 `log4j.properties` 文件，否则日志不会显示。该文件在本仓库中提供了
 4. 运行即可
 
 > 如下图显示的这些报错是不影响结果的，是由于部分包冲突，暂时未找到解决方案
