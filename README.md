@@ -213,7 +213,7 @@ public class Demo {
     }
 }
 ```
-1. 通过 WebUI 在 HDFS 中上传 test.txt 文件至/input/test.txt，详见实验给出的数据集
+1. 通过 WebUI(master:9870) 在 HDFS 中上传 test.txt 文件至/input/test.txt，详见实验给出的数据集
 2. 在 IDEA 中配置运行参数，第一个参数为`hdfs://master:8020/input/test.txt`，第二个参数为`hdfs://master:8020/output`
 ![alt text](Picture/image5.png)
 3. 在项目的 resources 文件夹下放置 `log4j.properties` 文件，仓库中提供了，否则日志不会显示
