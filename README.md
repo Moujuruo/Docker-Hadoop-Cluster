@@ -10,6 +10,8 @@
 
 Docker 的下载与安装参见，https://docs.docker.com/desktop/install/windows-install/, 个人推荐使用 WSL 2 的方式。
 
+> 该仓库 clone 到 windows 下概率出现 modify.sh 脚本换行符问题，导致环境无法正常启动，现已在 Dockerfile 中添加 dos2unix，解决该问题。如还未解决，可以手动将 modify.sh 换行符转换为 LF（VsCode 可以直接转换）。转换后重新走一遍下列步骤即可。感谢 cyq 同学！
+
 ## 具体步骤
 
 1. git clone 本仓库到本地 `git clone https://github.com/Moujuruo/Docker-Hadoop-Cluster.git`
