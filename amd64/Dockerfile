@@ -8,7 +8,7 @@ RUN sed -i "s@http://.*.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/a
 
 # 安装JDK等
 RUN apt-get update && \
-    apt-get install -y openjdk-8-jdk wget vim openssh-server net-tools
+    apt-get install -y openjdk-8-jdk wget vim openssh-server net-tools dos2unix
 
 # 配置SSH免密码登录
 RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
@@ -52,6 +52,7 @@ ENV YARN_NODEMANAGER_USER="root"
 # 配置Hadoop
 COPY hadoop_config/* /root/hadoop/etc/hadoop/
 COPY modify.sh /root/modify.sh
+RUN dos2unix modify.sh
 
 # Make the script executable
 RUN chmod +x /root/modify.sh
